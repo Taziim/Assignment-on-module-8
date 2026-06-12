@@ -57,10 +57,6 @@
 
 ---
 
-##Unabel to depoy to ec2
-
----
-
 ## Terraform Code
 ```main.tf
 # -------------------------
