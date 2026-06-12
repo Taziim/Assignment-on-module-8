@@ -54,6 +54,7 @@
 Created a GitHub Actions CI workflow to automatically verify EC2 instance connectivity.
 
 ## Screenshots
+
 ### GitHub Actions - EC2 Connectivity Test
 <img width="100%" alt="EC2 connectivity workflow result" src="./screenshots/ec2-connectivity-githubactions.png">
 
@@ -165,15 +166,14 @@ jobs:
             echo "          Connection Check Complete!"
             echo "=================================================="
           EOF
-      
+
       - name: Cleanup SSH Key
         if: always()
         run: |
           rm -f ~/.ssh/ec2_key
+```
 
----
-
-##Terraform Code
+### Terraform Code
 ```main.tf
 # -------------------------
 # VPC
