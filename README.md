@@ -1,12 +1,12 @@
 # Assingment 8
 # Infrastructure Workflow
---Created access key from aws using access key added to tf vars
---created vpc
---Created a workflow using github actions that can check ec2 connectivity
-
+- Created AWS access key and configured it in Terraform variables
+- Provisioned a custom VPC using Terraform
+- Created public and private subnets
+- Deployed EC2 instances inside the VPC
+- Built a GitHub Actions workflow to verify EC2 connectivity
 
 # Screenshots
-
 ## Terraform Apply
 <img width="100%" alt="terraform-apply" src="./screenshots/terraformInit.png">
 <img width="100%" alt="terraform-apply" src="./screenshots/terraformPlan.png">
@@ -166,10 +166,13 @@ jobs:
         if: always()
         run: |
           rm -f ~/.ssh/ec2_key
-          
----
 
-## Terraform Code
+---
+##Screenshots
+###GitHub Actions - EC2 Connectivity Test
+<img width="100%" alt="EC2 connectivity workflow result" src="./screenshots/ec2-connectivity-githubactions.png">
+
+##Terraform Code
 ```main.tf
 # -------------------------
 # VPC
