@@ -53,6 +53,10 @@
 ## GitHub Actions Workflow
 Created a GitHub Actions CI workflow to automatically verify EC2 instance connectivity.
 
+## Screenshots
+### GitHub Actions - EC2 Connectivity Test
+<img width="100%" alt="EC2 connectivity workflow result" src="./screenshots/ec2-connectivity-githubactions.png">
+
 ### Workflow Configuration
 The workflow:
 - Uses **Ubuntu Latest** GitHub runner
@@ -168,9 +172,6 @@ jobs:
           rm -f ~/.ssh/ec2_key
 
 ---
-##Screenshots
-###GitHub Actions - EC2 Connectivity Test
-<img width="100%" alt="EC2 connectivity workflow result" src="./screenshots/ec2-connectivity-githubactions.png">
 
 ##Terraform Code
 ```main.tf
