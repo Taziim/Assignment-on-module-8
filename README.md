@@ -2,7 +2,8 @@
 # Infrastructure Workflow
 --Created access key from aws using access key added to tf vars
 --created vpc
---
+--Created a workflow using github actions that can check ec2 connectivity
+
 
 # Screenshots
 
@@ -50,11 +51,122 @@
 ![Elastic IP](./screenshots/elasticIp.png)
 
 ## GitHub Actions Workflow
+Created a GitHub Actions CI workflow to automatically verify EC2 instance connectivity.
 
-#Install and Build
+### Workflow Configuration
+The workflow:
+- Uses **Ubuntu Latest** GitHub runner
+- Connects to EC2 instance through SSH
+- Validates server connectivity
+- Uses GitHub Actions Secrets for secure authentication
 
-<img width="100%" alt="terraform-apply" src="./screenshots/image.png">
+### Added Configuration
+Configured the following secrets in GitHub Actions:
 
+- `HOST` → EC2 public IP / hostname
+- `USERNAME` → EC2 user
+- `SSH_KEY` → Private SSH key
+
+Example workflow:
+```yaml
+
+name: EC2 Connectivity Check
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  check-ec2-connectivity:
+    name: Verify EC2 Connection & Extract Metadata
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Test EC2 Connectivity
+        run: |
+          echo "Testing SSH connection to EC2 instance..."
+          ssh -i ~/.ssh/ec2_key -o ConnectTimeout=10 ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo 'SSH connection successful!'"
+      
+      - name: Extract EC2 Metadata
+        run: |
+          echo "Extracting EC2 instance metadata..."
+          ssh -i ~/.ssh/ec2_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            echo "=================================================="
+            echo "          EC2 Instance Information"
+            echo "=================================================="
+            
+            # Get IMDSv2 token (required for metadata access)
+            TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+              -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+            
+            # Get hostname
+            echo ""
+            echo "Hostname:"
+            hostname
+            
+            # Get public IP from AWS metadata service (IMDSv2)
+            echo ""
+            echo "Public IP Address:"
+            curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+              http://169.254.169.254/latest/meta-data/public-ipv4 || echo "Unable to retrieve public IP"
+            echo ""
+            
+            # Get private IP from AWS metadata service (IMDSv2)
+            echo ""
+            echo "Private IP Address:"
+            curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+              http://169.254.169.254/latest/meta-data/local-ipv4 || echo "Unable to retrieve private IP"
+            echo ""
+            
+            # Get instance ID
+            echo ""
+            echo "Instance ID:"
+            curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+              http://169.254.169.254/latest/meta-data/instance-id || echo "Unable to retrieve instance ID"
+            echo ""
+            
+            # Get availability zone
+            echo ""
+            echo "Availability Zone:"
+            curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+              http://169.254.169.254/latest/meta-data/placement/availability-zone || echo "Unable to retrieve AZ"
+            echo ""
+            
+            # Get instance type
+            echo ""
+            echo "Instance Type:"
+            curl -s -H "X-aws-ec2-metadata-token: $TOKEN" \
+              http://169.254.169.254/latest/meta-data/instance-type || echo "Unable to retrieve instance type"
+            echo ""
+            
+            # System uptime
+            echo ""
+            echo "System Uptime:"
+            uptime
+            
+            echo ""
+            echo "=================================================="
+            echo "          Connection Check Complete!"
+            echo "=================================================="
+          EOF
+      
+      - name: Cleanup SSH Key
+        if: always()
+        run: |
+          rm -f ~/.ssh/ec2_key
+          
 ---
 
 ## Terraform Code
