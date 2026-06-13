@@ -399,6 +399,15 @@ terraform {
     }
   }
 }
+```
+# Screenshots
+## Dashboard of Application
+<img width="100%" alt="terraform-apply" src="./screenshots/bmiRunning .png">
+<img width="100%" alt="terraform-apply" src="./screenshots/grafana.png">
+<img width="100%" alt="terraform-apply" src="./screenshots/grafana2.png">
+<img width="100%" alt="terraform-apply" src="./screenshots/grafana3.png">
+<img width="100%" alt="terraform-apply" src="./screenshots/grafana4.png">
+<img width="100%" alt="terraform-apply" src="./screenshots/promethus2.png">
+<img width="100%" alt="terraform-apply" src="./screenshots/promethus3.png">
 
----
 
